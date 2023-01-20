@@ -1,7 +1,7 @@
 /* global $, hljs, window, document */
+const armbianBuildPrelude = '# Armbian ANSI build logs';
 
 ///// represents a single document
-
 var haste_document = function () {
     this.locked = false;
 };
@@ -17,35 +17,54 @@ haste_document.prototype.htmlEscape = function (s) {
 
 // Get this document from the server and lock it here
 haste_document.prototype.load = function (key, callback, lang) {
+    console.log("Loading document key", key, "lang", lang);
     var _this = this;
     $.ajax('/documents/' + key, {
-        type: 'get',
-        dataType: 'json',
-        success: function (res) {
+        type: 'get', dataType: 'json', success: function (res) {
+            console.log("Loaded success document key", key, "lang", lang);
             _this.locked = true;
             _this.key = key;
             _this.data = res.data;
+
+            let final_language;
+            let highlighted;
             try {
                 var high;
                 if (lang === 'txt') {
+                    console.log("Highlighting as text");
                     high = {value: _this.htmlEscape(res.data)};
+                    final_language = high.language;
+                    highlighted = high.value;
                 } else if (lang) {
+                    console.log("Highlighting as", lang);
                     high = hljs.highlight(lang, res.data);
+                    final_language = high.language;
+                    highlighted = high.value;
                 } else {
-                    high = hljs.highlightAuto(res.data);
+                    console.log("Highlighting auto (err.. wrong)");
+                    if (res.data.startsWith(armbianBuildPrelude)) {
+                        console.log("Highlighting as Armbian build log");
+                        final_language = "Armbian ANSI build logs"
+                        highlighted = new Filter().toHtml(res.data);
+                    } else {
+                        high = hljs.highlightAuto(res.data);
+                        final_language = high.language;
+                        highlighted = high.value;
+                    }
                 }
             } catch (err) {
                 // failed highlight, fall back on auto
+                console.log("Highlighting auto (fallback)");
                 high = hljs.highlightAuto(res.data);
+                final_language = high.language;
+                highlighted = high.value;
             }
+            //console.log("Language FINAL", final_language, "value", highlighted);
             callback({
-                value: high.value,
-                key: key,
-                language: high.language || lang,
-                lineCount: res.data.split('\n').length
-            });
-        },
-        error: function () {
+                    value: highlighted, key: key, language: final_language || lang, lineCount: res.data.split('\n').length
+                }
+            );
+        }, error: function () {
             callback(false);
         }
     });
@@ -59,22 +78,14 @@ haste_document.prototype.save = function (data, callback) {
     this.data = data;
     var _this = this;
     $.ajax('/documents', {
-        type: 'post',
-        data: data,
-        dataType: 'json',
-        contentType: 'text/plain; charset=utf-8',
-        success: function (res) {
+        type: 'post', data: data, dataType: 'json', contentType: 'text/plain; charset=utf-8', success: function (res) {
             _this.locked = true;
             _this.key = res.key;
             var high = hljs.highlightAuto(data);
             callback(null, {
-                value: high.value,
-                key: res.key,
-                language: high.language,
-                lineCount: data.split('\n').length
+                value: high.value, key: res.key, language: high.language, lineCount: data.split('\n').length
             });
-        },
-        error: function (res) {
+        }, error: function (res) {
             try {
                 callback($.parseJSON(res.responseText));
             } catch (e) {
@@ -164,19 +175,49 @@ haste.prototype.newDocument = function (hideHistory) {
 // due to the behavior of lookupTypeByExtension and lookupExtensionByType
 // Note: optimized for lookupTypeByExtension
 haste.extensionMap = {
-    rb: 'ruby', py: 'python', pl: 'perl', php: 'php', scala: 'scala', go: 'go',
-    xml: 'xml', html: 'xml', htm: 'xml', css: 'css', js: 'javascript', vbs: 'vbscript',
-    lua: 'lua', pas: 'delphi', java: 'java', cpp: 'cpp', cc: 'cpp', m: 'objectivec',
-    vala: 'vala', sql: 'sql', sm: 'smalltalk', lisp: 'lisp', ini: 'ini',
-    diff: 'diff', bash: 'bash', sh: 'bash', tex: 'tex', erl: 'erlang', hs: 'haskell',
-    md: 'markdown', txt: '', coffee: 'coffee', swift: 'swift'
+    rb: 'ruby',
+    py: 'python',
+    pl: 'perl',
+    php: 'php',
+    scala: 'scala',
+    go: 'go',
+    xml: 'xml',
+    html: 'xml',
+    htm: 'xml',
+    css: 'css',
+    js: 'javascript',
+    vbs: 'vbscript',
+    lua: 'lua',
+    pas: 'delphi',
+    java: 'java',
+    cpp: 'cpp',
+    cc: 'cpp',
+    m: 'objectivec',
+    vala: 'vala',
+    sql: 'sql',
+    sm: 'smalltalk',
+    lisp: 'lisp',
+    ini: 'ini',
+    diff: 'diff',
+    bash: 'bash',
+    sh: 'bash',
+    tex: 'tex',
+    erl: 'erlang',
+    hs: 'haskell',
+    md: 'markdown',
+    txt: '',
+    coffee: 'coffee',
+    swift: 'swift'
 };
 
 // Look up the extension preferred for a type
 // If not found, return the type itself - which we'll place as the extension
 haste.prototype.lookupExtensionByType = function (type) {
     for (let key in haste.extensionMap) {
-        if (haste.extensionMap[key] === type) return key;
+        if (haste.extensionMap[key] === type) {
+            console.log("Found extension", key, "for type", type);
+            return key;
+        }
     }
     return type;
 };
@@ -184,7 +225,9 @@ haste.prototype.lookupExtensionByType = function (type) {
 // Look up the type for a given extension
 // If not found, return the extension - which we'll attempt to use as the type
 haste.prototype.lookupTypeByExtension = function (ext) {
-    return haste.extensionMap[ext] || ext;
+    let result = haste.extensionMap[ext] || ext;
+    console.log("Found type", result, "for extension", ext);
+    return result;
 };
 
 // Add line numbers to the document
@@ -206,6 +249,7 @@ haste.prototype.removeLineNumbers = function () {
 haste.prototype.loadDocument = function (key) {
     // Split the key up
     var parts = key.split('.', 2);
+    console.log("Loading document", key, "with parts", parts);
     // Ask for what we want
     var _this = this;
     _this.doc = new haste_document();
@@ -256,65 +300,39 @@ haste.prototype.lockDocument = function () {
 
 haste.prototype.configureButtons = function () {
     var _this = this;
-    this.buttons = [
-        {
-            $where: $('#box2 .save'),
-            label: 'Save',
-            shortcutDescription: 'control + s',
-            shortcut: function (evt) {
-                return evt.ctrlKey && (evt.keyCode === 83);
-            },
-            action: function () {
-                if (_this.$textarea.val().replace(/^\s+|\s+$/g, '') !== '') {
-                    _this.lockDocument();
-                }
-            }
-        },
-        {
-            $where: $('#box2 .new'),
-            label: 'New',
-            shortcut: function (evt) {
-                return evt.ctrlKey && evt.keyCode === 78;
-            },
-            shortcutDescription: 'control + n',
-            action: function () {
-                _this.newDocument(!_this.doc.key);
-            }
-        },
-        {
-            $where: $('#box2 .duplicate'),
-            label: 'Duplicate & Edit',
-            shortcut: function (evt) {
-                return _this.doc.locked && evt.ctrlKey && evt.keyCode === 68;
-            },
-            shortcutDescription: 'control + d',
-            action: function () {
-                _this.duplicateDocument();
-            }
-        },
-        {
-            $where: $('#box2 .raw'),
-            label: 'Just Text',
-            shortcut: function (evt) {
-                return evt.ctrlKey && evt.shiftKey && evt.keyCode === 82;
-            },
-            shortcutDescription: 'control + shift + r',
-            action: function () {
-                window.location.href = '/raw/' + _this.doc.key;
-            }
-        },
-        {
-            $where: $('#box2 .twitter'),
-            label: 'Twitter',
-            shortcut: function (evt) {
-                return _this.options.twitter && _this.doc.locked && evt.shiftKey && evt.ctrlKey && evt.keyCode == 84;
-            },
-            shortcutDescription: 'control + shift + t',
-            action: function () {
-                window.open('https://twitter.com/share?url=' + encodeURI(window.location.href));
+    this.buttons = [{
+        $where: $('#box2 .save'), label: 'Save', shortcutDescription: 'control + s', shortcut: function (evt) {
+            return evt.ctrlKey && (evt.keyCode === 83);
+        }, action: function () {
+            if (_this.$textarea.val().replace(/^\s+|\s+$/g, '') !== '') {
+                _this.lockDocument();
             }
         }
-    ];
+    }, {
+        $where: $('#box2 .new'), label: 'New', shortcut: function (evt) {
+            return evt.ctrlKey && evt.keyCode === 78;
+        }, shortcutDescription: 'control + n', action: function () {
+            _this.newDocument(!_this.doc.key);
+        }
+    }, {
+        $where: $('#box2 .duplicate'), label: 'Duplicate & Edit', shortcut: function (evt) {
+            return _this.doc.locked && evt.ctrlKey && evt.keyCode === 68;
+        }, shortcutDescription: 'control + d', action: function () {
+            _this.duplicateDocument();
+        }
+    }, {
+        $where: $('#box2 .raw'), label: 'Just Text', shortcut: function (evt) {
+            return evt.ctrlKey && evt.shiftKey && evt.keyCode === 82;
+        }, shortcutDescription: 'control + shift + r', action: function () {
+            window.location.href = '/raw/' + _this.doc.key;
+        }
+    }, {
+        $where: $('#box2 .twitter'), label: 'Twitter', shortcut: function (evt) {
+            return _this.options.twitter && _this.doc.locked && evt.shiftKey && evt.ctrlKey && evt.keyCode == 84;
+        }, shortcutDescription: 'control + shift + t', action: function () {
+            window.open('https://twitter.com/share?url=' + encodeURI(window.location.href));
+        }
+    }];
     for (var i = 0; i < this.buttons.length; i++) {
         this.configureButton(this.buttons[i]);
     }
@@ -378,8 +396,7 @@ $(function () {
                 var startPos = this.selectionStart;
                 var endPos = this.selectionEnd;
                 var scrollTop = this.scrollTop;
-                this.value = this.value.substring(0, startPos) + myValue +
-                    this.value.substring(endPos, this.value.length);
+                this.value = this.value.substring(0, startPos) + myValue + this.value.substring(endPos, this.value.length);
                 this.focus();
                 this.selectionStart = startPos + myValue.length;
                 this.selectionEnd = startPos + myValue.length;
