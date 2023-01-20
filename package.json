@@ -1,6 +1,6 @@
 {
   "name": "haste",
-  "version": "0.1.0",
+  "version": "0.1.0-rpardini",
   "private": true,
   "description": "Private Pastebin Server",
   "keywords": [
@@ -14,19 +14,20 @@
   },
   "main": "haste",
   "dependencies": {
-    "busboy": "0.2.4",
-    "connect": "^3.7.0",
-    "connect-ratelimit": "0.0.7",
-    "connect-route": "0.1.5",
-    "pg": "^8.0.0",
-    "redis": "0.8.1",
-    "redis-url": "0.1.0",
-    "st": "^2.0.0",
-    "uglify-js": "3.1.6",
-    "winston": "^2.0.0"
+    "busboy": "^1",
+    "connect": "^3",
+    "connect-ratelimit": "^0",
+    "connect-route": "^0",
+    "memcached": "^2",
+    "pg": "^8",
+    "redis": "^0",
+    "redis-url": "^0",
+    "st": "^2",
+    "uglify-js": "^3",
+    "winston": "^2"
   },
   "devDependencies": {
-    "mocha": "^8.1.3"
+    "mocha": "^10"
   },
   "bundledDependencies": [],
   "bin": {

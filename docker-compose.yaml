@@ -7,6 +7,6 @@ services:
       - STORAGE_HOST=memcached
       - STORAGE_PORT=11211
     ports:
-      - 7777:7777
+      - "7777:7777"
   memcached:
     image: memcached:latest
