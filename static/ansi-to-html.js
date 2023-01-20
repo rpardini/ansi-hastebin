@@ -13,11 +13,11 @@ const defaults = {
 
 function getDefaultColors() {
     const colors = {
-        0: '#AAA', // no, NOT BLACK
+        0: '#999', // no, NOT BLACK
         1: '#A00',
         2: '#0A0',
         3: '#A50',
-        4: '#0000d5',
+        4: '#4242da',
         5: '#A0A',
         6: '#0AA',
         7: '#AAA',
