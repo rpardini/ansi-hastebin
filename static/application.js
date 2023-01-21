@@ -28,36 +28,22 @@ haste_document.prototype.load = function (key, callback, lang) {
 
             let final_language;
             let highlighted;
-            try {
-                var high;
-                if (lang === 'txt') {
-                    console.log("Highlighting as text");
-                    high = {value: _this.htmlEscape(res.data)};
-                    final_language = high.language;
-                    highlighted = high.value;
-                } else if (lang) {
-                    console.log("Highlighting as", lang);
-                    high = hljs.highlight(lang, res.data);
-                    final_language = high.language;
-                    highlighted = high.value;
-                } else {
-                    console.log("Highlighting auto (err.. wrong)");
-                    if (res.data.startsWith(armbianBuildPrelude)) {
-                        console.log("Highlighting as Armbian build log");
-                        final_language = "Armbian ANSI build logs"
-                        highlighted = new Filter().toHtml(res.data);
-                    } else {
-                        high = hljs.highlightAuto(res.data);
-                        final_language = high.language;
-                        highlighted = high.value;
-                    }
-                }
-            } catch (err) {
-                // failed highlight, fall back on auto
-                console.log("Highlighting auto (fallback)");
-                high = hljs.highlightAuto(res.data);
+            var high;
+            if (lang === 'txt') {
+                console.log("Highlighting as text");
+                high = {value: _this.htmlEscape(res.data)};
                 final_language = high.language;
                 highlighted = high.value;
+            } else if (lang !== undefined && lang !== 'ans') {
+                console.log("Highlighting as", lang);
+                high = hljs.highlight(lang, res.data);
+                final_language = high.language;
+                highlighted = high.value;
+            } else {
+                // don't guess, use ANSI
+                console.log("Highlighting ANSI");
+                final_language = "ans"
+                highlighted = new Filter({}).toHtml(res.data);
             }
             //console.log("Language FINAL", final_language, "value", highlighted);
             callback({
