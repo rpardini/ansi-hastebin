@@ -148,7 +148,7 @@ function handleDisplay(stack, code, options) {
         1: () => pushTag(stack, 'b'), // bold
         3: () => pushTag(stack, 'i'),
         4: () => pushTag(stack, 'u'),
-        8: () => pushStyle(stack, 'display:none'),
+        //8: () => pushStyle(stack, 'display:none'),
         9: () => pushTag(stack, 'strike'),
         22: () => pushStyle(stack, 'font-weight:normal;text-decoration:none;font-style:normal'),
         23: () => closeTag(stack, 'i'),

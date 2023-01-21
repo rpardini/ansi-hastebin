@@ -1,5 +1,4 @@
 /* global $, hljs, window, document */
-const armbianBuildPrelude = '# Armbian ANSI build logs';
 
 ///// represents a single document
 var haste_document = function () {
@@ -44,10 +43,13 @@ haste_document.prototype.load = function (key, callback, lang) {
                 console.log("Highlighting ANSI");
                 final_language = "ans"
                 highlighted = new Filter({}).toHtml(res.data);
+                console.log("ANSI highlighted!");
             }
             //console.log("Language FINAL", final_language, "value", highlighted);
+            let lineCount = res.data.split('\n').length;
+            console.log("Line count", lineCount);
             callback({
-                    value: highlighted, key: key, language: final_language || lang, lineCount: res.data.split('\n').length
+                    value: highlighted, key: key, language: final_language || lang, lineCount: lineCount
                 }
             );
         }, error: function () {
@@ -92,15 +94,12 @@ var haste = function (appName, options) {
     this.options = options;
     this.configureShortcuts();
     this.configureButtons();
-    // If twitter is disabled, hide the button
-    if (!options.twitter) {
-        $('#box2 .twitter').hide();
-    }
+    $('#box2').hide(); // hide the whole hastebin box
 };
 
 // Set the page title - include the appName
 haste.prototype.setTitle = function (ext) {
-    var title = ext ? this.appName + ' - ' + ext : this.appName;
+    var title = ext ? (this.appName + ' - ' + ext) : this.appName;
     document.title = title;
 };
 
@@ -233,6 +232,7 @@ haste.prototype.removeLineNumbers = function () {
 
 // Load a document and show it
 haste.prototype.loadDocument = function (key) {
+    console.log("LOADING DOCUMENT");
     // Split the key up
     var parts = key.split('.', 2);
     console.log("Loading document", key, "with parts", parts);
@@ -264,6 +264,7 @@ haste.prototype.duplicateDocument = function () {
 
 // Lock the current document
 haste.prototype.lockDocument = function () {
+    console.log("LOCKING DOCUMENT");
     var _this = this;
     this.doc.save(this.$textarea.val(), function (err, ret) {
         if (err) {
