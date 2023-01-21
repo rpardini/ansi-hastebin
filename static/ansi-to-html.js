@@ -145,7 +145,7 @@ function handleDisplay(stack, code, options) {
     const codeMap = {
         '-1': () => '<br/>',
         0: () => stack.length && resetStyles(stack),
-        1: () => pushTag(stack, 'b'),
+        1: () => pushTag(stack, 'b'), // bold
         3: () => pushTag(stack, 'i'),
         4: () => pushTag(stack, 'u'),
         8: () => pushStyle(stack, 'display:none'),
