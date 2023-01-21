@@ -1,9 +1,10 @@
 {
-  "name": "haste",
-  "version": "0.1.0-rpardini",
+  "name": "ansi-hastebin",
+  "version": "0.0.1-rpardini",
   "private": true,
-  "description": "Private Pastebin Server",
+  "description": "Private Pastebin Server hacked for ANSI",
   "keywords": [
+    "ansi",
     "paste",
     "pastebin"
   ],
