@@ -119,6 +119,15 @@ app.use(route(function (router) {
         return documentHandler.handleRawGet(request, response, config);
     });
 
+    // add logs, via PUT and POST, for scripting
+    router.post('/log', function (request, response) {
+        return documentHandler.handlePutLog(request, response);
+    });
+    router.put('/log', function (request, response) {
+        return documentHandler.handlePutLog(request, response);
+    });
+    
+
     // add documents
 
     router.post('/documents', function (request, response) {
