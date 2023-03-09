@@ -1,6 +1,6 @@
 {
   "name": "ansi-hastebin",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "private": true,
   "description": "Private Pastebin Server hacked for ANSI",
   "keywords": [
