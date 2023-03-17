@@ -94,7 +94,10 @@ var haste = function (appName, options) {
     this.options = options;
     this.configureShortcuts();
     this.configureButtons();
-    $('#box2').hide(); // hide the whole hastebin box
+    // If Twitter is disabled, hide the button
+    if (!options.twitter) {
+        $('#box2 .twitter').hide();
+    }
 };
 
 // Set the page title - include the appName
