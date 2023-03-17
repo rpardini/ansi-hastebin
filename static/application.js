@@ -223,7 +223,7 @@ haste.prototype.lookupTypeByExtension = function (ext) {
 haste.prototype.addLineNumbers = function (lineCount) {
     var h = '';
     for (var i = 0; i < lineCount; i++) {
-        h += (i + 1).toString() + '<br/>';
+        h += "<a class='linenoitem' id='l" + (i + 1).toString() + "'>" + (i + 1).toString() + "</a>" + '<br/>';
     }
     $('#linenos').html(h);
 };
