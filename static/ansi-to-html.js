@@ -4,11 +4,7 @@
 
 //const entities = require('entities');
 const defaults = {
-    fg: '#FFF',
-    bg: '#000',
-    newline: false,
-    stream: false,
-    colors: getDefaultColors()
+    fg: '#FFF', bg: '#000', newline: false, stream: false, colors: getDefaultColors()
 };
 
 function getDefaultColors() {
@@ -147,14 +143,12 @@ function handleDisplay(stack, code, options) {
         0: () => stack.length && resetStyles(stack),
         1: () => pushTag(stack, 'b'), // bold
         3: () => pushTag(stack, 'i'),
-        4: () => pushTag(stack, 'u'),
-        //8: () => pushStyle(stack, 'display:none'),
+        4: () => pushTag(stack, 'u'), //8: () => pushStyle(stack, 'display:none'),
         9: () => pushTag(stack, 'strike'),
         22: () => pushStyle(stack, 'font-weight:normal;text-decoration:none;font-style:normal'),
         23: () => closeTag(stack, 'i'),
         24: () => closeTag(stack, 'u'),
-        39: () => pushForegroundColor(stack, options.fg),
-        //49: () => pushBackgroundColor(stack, options.bg),
+        39: () => pushForegroundColor(stack, options.fg), //49: () => pushBackgroundColor(stack, options.bg),
         53: () => pushStyle(stack, 'text-decoration:overline')
     };
 
@@ -255,7 +249,11 @@ function categoryForCode(code) {
  * @returns {string}
  */
 function pushText(text, options) {
-    return text;
+    return text
+        .replace(/&/g, '&amp;')
+        .replace(/>/g, '&gt;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
 }
 
 /**
@@ -371,35 +369,25 @@ function tokenize(text, options, callback) {
 
     /* eslint no-control-regex:0 */
     const tokens = [{
-        pattern: /^\x08+/,
-        sub: remove
+        pattern: /^\x08+/, sub: remove
     }, {
-        pattern: /^\x1b\[[012]?K/,
-        sub: remove
+        pattern: /^\x1b\[[012]?K/, sub: remove
     }, {
-        pattern: /^\x1b\[\(B/,
-        sub: remove
+        pattern: /^\x1b\[\(B/, sub: remove
     }, {
-        pattern: /^\x1b\[[34]8;2;\d+;\d+;\d+m/,
-        sub: rgb
+        pattern: /^\x1b\[[34]8;2;\d+;\d+;\d+m/, sub: rgb
     }, {
-        pattern: /^\x1b\[38;5;(\d+)m/,
-        sub: removeXterm256Foreground
+        pattern: /^\x1b\[38;5;(\d+)m/, sub: removeXterm256Foreground
     }, {
-        pattern: /^\x1b\[48;5;(\d+)m/,
-        sub: removeXterm256Background
+        pattern: /^\x1b\[48;5;(\d+)m/, sub: removeXterm256Background
     }, {
-        pattern: /^\n/,
-        sub: newline
+        pattern: /^\n/, sub: newline
     }, {
-        pattern: /^\r+\n/,
-        sub: newline
+        pattern: /^\r+\n/, sub: newline
     }, {
-        pattern: /^\r/,
-        sub: newline
+        pattern: /^\r/, sub: newline
     }, {
-        pattern: /^\x1b\[((?:\d{1,3};?)+|)m/,
-        sub: ansiMess
+        pattern: /^\x1b\[((?:\d{1,3};?)+|)m/, sub: ansiMess
     }, {
         // CSI n J
         // ED - Erase in Display Clears part of the screen.
@@ -408,17 +396,14 @@ function tokenize(text, options, callback) {
         // If n is 2, clear entire screen (and moves cursor to upper left on DOS ANSI.SYS).
         // If n is 3, clear entire screen and delete all lines saved in the scrollback buffer
         //   (this feature was added for xterm and is supported by other terminal applications).
-        pattern: /^\x1b\[\d?J/,
-        sub: remove
+        pattern: /^\x1b\[\d?J/, sub: remove
     }, {
         // CSI n ; m f
         // HVP - Horizontal Vertical Position Same as CUP
-        pattern: /^\x1b\[\d{0,3};\d{0,3}f/,
-        sub: remove
+        pattern: /^\x1b\[\d{0,3};\d{0,3}f/, sub: remove
     }, {
         // catch-all for CSI sequences?
-        pattern: /^\x1b\[?[\d;]{0,3}/,
-        sub: remove
+        pattern: /^\x1b\[?[\d;]{0,3}/, sub: remove
     }, {
         /**
          * extracts real text - not containing:
@@ -427,8 +412,7 @@ function tokenize(text, options, callback) {
          * - `\n` - Newline - linefeed (LF) (ascii 10)
          * - `\r` - Windows Carriage Return (CR)
          */
-        pattern: /^(([^\x1b\x08\r\n])+)/,
-        sub: realText
+        pattern: /^(([^\x1b\x08\r\n])+)/, sub: realText
     }];
 
     function process(handler, i) {
