@@ -154,7 +154,7 @@ function handleDisplay(stack, code, options) {
         23: () => closeTag(stack, 'i'),
         24: () => closeTag(stack, 'u'),
         39: () => pushForegroundColor(stack, options.fg),
-        49: () => pushBackgroundColor(stack, options.bg),
+        //49: () => pushBackgroundColor(stack, options.bg),
         53: () => pushStyle(stack, 'text-decoration:overline')
     };
 
@@ -165,12 +165,12 @@ function handleDisplay(stack, code, options) {
         result = pushTag(stack, 'blink');
     } else if (29 < code && code < 38) {
         result = pushForegroundColor(stack, options.colors[code - 30]);
-    } else if ((39 < code && code < 48)) {
-        result = pushBackgroundColor(stack, options.colors[code - 40]);
+        //} else if ((39 < code && code < 48)) {
+        //    result = pushBackgroundColor(stack, options.colors[code - 40]);
     } else if ((89 < code && code < 98)) {
         result = pushForegroundColor(stack, options.colors[8 + (code - 90)]);
-    } else if ((99 < code && code < 108)) {
-        result = pushBackgroundColor(stack, options.colors[8 + (code - 100)]);
+        //} else if ((99 < code && code < 108)) {
+        //    result = pushBackgroundColor(stack, options.colors[8 + (code - 100)]);
     }
 
     return result;
