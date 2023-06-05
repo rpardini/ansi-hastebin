@@ -2,7 +2,7 @@ body {
     background: #000;
     padding: 20px 50px;
     margin: 0;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Fira Code', monospace;
 }
 
 body pre.hljs {
@@ -11,7 +11,7 @@ body pre.hljs {
 }
 
 body pre.hljs code {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Fira Code', monospace;
 }
 
 body pre.hljs code b {
