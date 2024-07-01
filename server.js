@@ -153,7 +153,6 @@ app.use(connect_st({
 // so route it back to /
 app.use(route(function (router) {
     router.get('/:id', function (request, response, next) {
-        winston.info("wtf, redirect?");
         request.sturl = '/';
         next();
     });
