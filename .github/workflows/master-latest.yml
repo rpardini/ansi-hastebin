@@ -3,7 +3,7 @@ name: master-latest
 on:
   workflow_dispatch:
   push:
-    branches: [ "master" ]
+    branches: [ "node20" ]
   #schedule:
   #  - cron: '0 3 * * *' # Scheduled runs every day at 3am UTC
 
@@ -44,7 +44,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           pull: true # avoid bitrot with repeated cache hits
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/ansi-hastebin:latest,ghcr.io/${{ github.repository_owner }}/ansi-hastebin:0.0.8 # @TODO: read from package.json
+          tags: ghcr.io/${{ github.repository_owner }}/ansi-hastebin:latest,ghcr.io/${{ github.repository_owner }}/ansi-hastebin:0.0.8-node20 # @TODO: read from package.json
           labels: |
             org.opencontainers.image.title=ansi-hastebin
             org.opencontainers.image.description=${{ github.event.repository.description }}
