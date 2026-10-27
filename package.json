@@ -28,7 +28,7 @@
     "winston": "^2"
   },
   "devDependencies": {
-    "mocha": "^10"
+    "mocha": "^12"
   },
   "bundledDependencies": [],
   "bin": {
@@ -45,5 +45,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "mocha --recursive"
+  },
+  "engines": {
+    "node": ">=26"
   }
 }
